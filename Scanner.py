@@ -9,6 +9,10 @@ EOF = "EOF"
 
 OPERATORS = ""
 
+##      LETTER = "abcdefghijklmnñopqrstuvwxyzABCDEFGHIJKLMNÑOPQRSTUVWXYZ_"
+
+##      NUMBER = "0123456789"
+
 #class Error():
 #    Colocar los posibles errores en otro archivo
 #    def __init__(self):
@@ -47,7 +51,15 @@ class Scanner():
     ### FUNCIONES
     def getInteger(self):
         print("getInteger")
-
+        
+    ##      def isLet(self):
+        ##      if LETTER.find(current_char) != -1:
+            ##      return True
+        ##      return False
+    ##      def isNum(self):
+        ##      if NUMBER.find(current_char) != -1:
+            ##      return True
+        ##      return False        
 
     ####
 
@@ -55,14 +67,39 @@ class Scanner():
         # Se actualiza current_char
         # Se puede trabajar como tipo de char
         # ejemplo 0 LETTER, 1 DIGIT 
+        
+        ##      if len(buffer) == 0:
+            ##      current_char = ""
+        ##      else:
+            ##      pos[1] += 1
+            ##      current_char = buffer[0]
+            ##      buffer = buffer[1:]
+        
         print("getchar")
 
     def peekchar(self):
+        
+        ##      if len(buffer == 0):
+            ##      return ""
+        ##      return buffer[0]
+        
         # Ve el sig char sin consumirlo
         print("peekchar")
-
-
+# si se hace por lineas
+    ##      def skip_space(self):
+        ##      if len(buffer) == 0:    return
+        ##      while buffer[0] == ' ':
+            ##      current_posx += 1
+            ##      buffer = buffer[1:]
+        ##      if len(buffer) != 0 and buffer[0] == '\n':   
+            ##      newline = True
+            ##      current_line += 1
+            ##      buffer = buffer[1:]
+    
+        
     def getToken(self): #(tokentype, tokenval)
+        ##      skip_space()
+        ##      getchar()
         print("getToken")
 
     def debug(self):
