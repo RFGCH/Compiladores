@@ -1,3 +1,4 @@
+from ReservedWords import *
 '''
 # SCANNER
 - Maria Cruz
@@ -96,7 +97,12 @@ class Scanner():
             ##      current_line += 1
             ##      buffer = buffer[1:]
     
-        
+    def getTknKeyword(self,lexeme):
+        if lexeme in KEYWORDS:
+            return Token(KEYWORDS[lexeme],lexeme, self.pos[0], self.pos[1])
+        else:
+            return None
+
     def getToken(self): #(tokentype, tokenval)
         ##      skip_space()
         ##      getchar()
