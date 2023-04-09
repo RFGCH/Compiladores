@@ -43,7 +43,11 @@ class Scanner():
         self.current_char = None
         self.lexeme = ""
         self.state = 0
-        self.beginningOfLine = True
+        self.newLine = True
+
+        #Aux
+        self.firstOfDblOper = []
+        self.getFirstOfDblOper()
 
     def __del__(self):
         if self.archivo: self.archivo.close()
@@ -52,6 +56,10 @@ class Scanner():
         archivo = open(file)
         self.errores = []
     
+    def getFirstOfDblOper(self):
+        for op in OPER_DELIMITERS_2:
+            self.firstOfDblOper.append(op[0])
+
     ### FUNCIONES
     def getInteger(self):
         print("getInteger")
@@ -93,13 +101,30 @@ class Scanner():
             ##      current_line += 1
             ##      buffer = buffer[1:]
     
+    def ignoreSpaces(self):
+        if self.current_char == " ":
+            while self.peekchar() == " ":
+                self.getchar()
+
     def getIdentifier(self):
         # Consume todos los caracteres dentro de la expresion [a-z|A-Z][a-z|A-Z|0-9|_]*
         self.lexeme = self.current_char
-        self.getchar()
-        while self.current_char.isalpha() or self.current_char.isdigit() or self.current_char == "_":
-            self.lexeme += self.current_char
+        c = self.peekchar()
+        while c.isalpha() or c.isdigit() or c == "_":
             self.getchar()
+            self.lexeme += self.current_char
+            c = self.peekchar()
+
+    def getTknOper(self):
+        self.lexeme = self.current_char
+        if self.current_char in self.firstOfDblOper:
+            c = self.peekchar()
+            oper = self.lexeme + c
+            if oper in OPER_DELIMITERS_2:
+                self.getchar()
+                self.lexeme = oper
+                return Token(OPER_DELIMITERS_2[oper], oper, self.pos[0], self.pos[1])
+        return Token(OPER_DELIMITERS[self.lexeme], self.lexeme, self.pos[0], self.pos[1])
 
     '''
 def getToken(buffer_aux):
@@ -200,27 +225,43 @@ def getToken(buffer_aux):
 '''
 
     def getToken(self): #(tokentype, tokenval)
-        ##      skip_space()
-        ##      getchar()
+        self.lexeme = ""
         token = None
-        if not self.current_char:
-            self.getchar()
-        if self.current_char == " ":
-            self.state = 0
-            if self.beginningOfLine:
-                print("INDENT and DEDENT")
-            else:
-                print("Comenzar a ignorar espacios")
-        elif self.current_char.isalpha():
-            # Esta buscando un id o una palabra reservada
-            self.state = 1
+        self.getchar() #Nota, no consumir chars de otros tokens, en cambio usar peek char
+
+        # Buscar salto de linea
+        # Tener cuidado con logica para identificar lineas vacias
+        if self.current_char == "\n":
+            print("Tkn NEWLINE")
+            self.newLine = True
+            return
+        
+        if self.newLine:
+            print("INDENT and DEDENT")
+            return "token de ident o dedent"
+        
+        if not self.newLine: 
+            self.ignoreSpaces()
+        # Esta buscando un id o una palabra reservada
+        if self.current_char.isalpha():
             self.getIdentifier()
             if self.lexeme in KEYWORDS:
                 token = Token(KEYWORDS[self.lexeme],self.lexeme, self.pos[0], self.pos[1])
             else:
                 token = Token("ID",self.lexeme,self.pos[0], self.pos[1])
 
+        # Esta buscando un numero
+        elif self.current_char.isdigit():
+            print("Digit")
+        
+        # Buscar operadores
+        elif self.current_char in OPER_DELIMITERS or self.current_char in self.firstOfDblOper:
+            token = self.getTknOper()
 
+        else:
+            print("Error")
+
+        self.newLine = False
         print("getToken")
         return token
 
