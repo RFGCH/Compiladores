@@ -14,6 +14,8 @@ OPERATORS = ""
 
 ##      NUMBER = "0123456789"
 
+id
+
 #class Error():
 #    Colocar los posibles errores en otro archivo
 #    def __init__(self):
@@ -38,8 +40,10 @@ class Scanner():
         self.errores = []
 
         self.pos = [0,0] # Revisar, se podria usar alguna estructura
-        self.classchar = -1
         self.current_char = None
+        self.lexeme = ""
+        self.state = 0
+        self.beginningOfLine = True
 
     def __del__(self):
         if self.archivo: self.archivo.close()
@@ -47,7 +51,6 @@ class Scanner():
     def begin(self, file):
         archivo = open(file)
         self.errores = []
-
     
     ### FUNCIONES
     def getInteger(self):
@@ -64,28 +67,21 @@ class Scanner():
 
     ####
 
-    def getchar(self):
-        # Se actualiza current_char
+    def getchar(self): # Se actualiza current_char
         # Se puede trabajar como tipo de char
         # ejemplo 0 LETTER, 1 DIGIT 
-        
-        ##      if len(buffer) == 0:
-            ##      current_char = ""
-        ##      else:
-            ##      pos[1] += 1
-            ##      current_char = buffer[0]
-            ##      buffer = buffer[1:]
-        
-        print("getchar")
+        if len(self.buffer) == 0:
+            self.current_char = ""
+        else:
+            self.pos[1] += 1
+            # Obtiene el primer caracter y lo pone en self current char
+            self.buffer.lstrip(self.current_char)
 
     def peekchar(self):
-        
-        ##      if len(buffer == 0):
-            ##      return ""
-        ##      return buffer[0]
-        
-        # Ve el sig char sin consumirlo
-        print("peekchar")
+        if len(self.buffer == 0):
+            return ""
+        return self.buffer[0]
+
 # si se hace por lineas
     ##      def skip_space(self):
         ##      if len(buffer) == 0:    return
@@ -97,11 +93,13 @@ class Scanner():
             ##      current_line += 1
             ##      buffer = buffer[1:]
     
-    def getTknKeyword(self,lexeme):
-        if lexeme in KEYWORDS:
-            return Token(KEYWORDS[lexeme],lexeme, self.pos[0], self.pos[1])
-        else:
-            return None
+    def getIdentifier(self):
+        # Consume todos los caracteres dentro de la expresion [a-z|A-Z][a-z|A-Z|0-9|_]*
+        self.lexeme = self.current_char
+        self.getchar()
+        while self.current_char.isalpha() or self.current_char.isdigit() or self.current_char == "_":
+            self.lexeme += self.current_char
+            self.getchar()
 
     '''
 def getToken(buffer_aux):
@@ -204,7 +202,27 @@ def getToken(buffer_aux):
     def getToken(self): #(tokentype, tokenval)
         ##      skip_space()
         ##      getchar()
+        token = None
+        if not self.current_char:
+            self.getchar()
+        if self.current_char == " ":
+            self.state = 0
+            if self.beginningOfLine:
+                print("INDENT and DEDENT")
+            else:
+                print("Comenzar a ignorar espacios")
+        elif self.current_char.isalpha():
+            # Esta buscando un id o una palabra reservada
+            self.state = 1
+            self.getIdentifier()
+            if self.lexeme in KEYWORDS:
+                token = Token(KEYWORDS[self.lexeme],self.lexeme, self.pos[0], self.pos[1])
+            else:
+                token = Token("ID",self.lexeme,self.pos[0], self.pos[1])
+
+
         print("getToken")
+        return token
 
     def debug(self):
         print("INFO SCAN - Start scanning...")

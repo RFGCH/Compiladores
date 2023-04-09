@@ -40,14 +40,9 @@ OPER_DELIMITERS = {
     "+": "ADD",
     "-": "SUB",
     "*": "MUL",
-    "//": "DIV",
     "%": "MOD",
     "<": "LESS",
     ">": "GRTR",
-    "<=": "LESSEQ",
-    ">=": "GRTREQ",
-    "==": "EQ",
-    "!=": "DIF",
     "=": "ASSIGN",
     "(": "LPAREN",
     ")": "RPAREN",
@@ -56,5 +51,13 @@ OPER_DELIMITERS = {
     ",": "COMMA",
     ":": "COLON",
     ".": "DOT",
+}
+
+OPER_DELIMITERS_2 ={
+    "//": "DIV",
+    "<=": "LESSEQ",
+    ">=": "GRTREQ",
+    "==": "EQ",
+    "!=": "DIF",
     "->": "ARROW"
 }
